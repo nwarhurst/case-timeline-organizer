@@ -33,7 +33,19 @@ Resources:
         AllowOrigin: "'*'"
 
   CreateCaseFunction:
-     PresignUploadFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: src/create_case.lambda_handler
+      Events:
+        CreateCase:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /cases
+            Method: POST
+
+  PresignUploadFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: backend/
@@ -50,17 +62,6 @@ Resources:
           Properties:
             RestApiId: !Ref Api
             Path: /cases/{case_id}/presign
-            Method: POST
- Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: backend/
-      Handler: src/create_case.lambda_handler
-      Events:
-        CreateCase:
-          Type: Api
-          Properties:
-            RestApiId: !Ref Api
-            Path: /cases
             Method: POST
 
 Outputs:
