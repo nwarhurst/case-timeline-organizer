@@ -33,7 +33,25 @@ Resources:
         AllowOrigin: "'*'"
 
   CreateCaseFunction:
+     PresignUploadFunction:
     Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: src/presign_upload.lambda_handler
+      Environment:
+        Variables:
+          CASE_FILES_BUCKET: !Ref CaseFilesBucket
+      Policies:
+        - S3WritePolicy:
+            BucketName: !Ref CaseFilesBucket
+      Events:
+        PresignUpload:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /cases/{case_id}/presign
+            Method: POST
+ Type: AWS::Serverless::Function
     Properties:
       CodeUri: backend/
       Handler: src/create_case.lambda_handler
