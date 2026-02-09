@@ -1,3 +1,4 @@
+
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Case Timeline Organizer - MVP
@@ -22,7 +23,33 @@ Resources:
         BlockPublicPolicy: true
         RestrictPublicBuckets: true
 
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type'"
+        AllowOrigin: "'*'"
+
+  CreateCaseFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: src/create_case.lambda_handler
+      Events:
+        CreateCase:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /cases
+            Method: POST
+
 Outputs:
+  ApiUrl:
+    Description: API endpoint
+    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/prod"
+
   CaseFilesBucketName:
-    Description: Private bucket for case files and outputs
+    Description: Private bucket for case files
     Value: !Ref CaseFilesBucket
