@@ -46,6 +46,46 @@ Resources:
             Method: POST
 
   PresignUploadFunction:
+    ListFilesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: src/list_files.lambda_handler
+      Environment:
+        Variables:
+          CASE_FILES_BUCKET: !Ref CaseFilesBucket
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref CaseFilesBucket
+      Events:
+        ListFiles:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /cases/{case_id}/files
+            Method: GET
+
+  BuildIndexFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: src/build_index.lambda_handler
+      Environment:
+        Variables:
+          CASE_FILES_BUCKET: !Ref CaseFilesBucket
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref CaseFilesBucket
+        - S3WritePolicy:
+            BucketName: !Ref CaseFilesBucket
+      Events:
+        BuildIndex:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /cases/{case_id}/build-index
+            Method: POST
+
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: backend/
